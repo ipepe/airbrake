@@ -45,8 +45,18 @@ module Airbrake
         return unless defined?(Rails)
 
         ActiveSupport::Notifications.subscribe(
+          'start_processing.action_controller',
+          Airbrake::Rails::ActionControllerRouteSubscriber.new
+        )
+
+        ActiveSupport::Notifications.subscribe(
+          'sql.active_record',
+          Airbrake::Rails::ActiveRecordSubscriber.new(@notifier)
+        )
+
+        ActiveSupport::Notifications.subscribe(
           'process_action.action_controller',
-          Airbrake::Rails::ActionControllerRouteSubscriber.new(@notifier)
+          Airbrake::Rails::ActionControllerNotifySubscriber.new(@notifier)
         )
       end
 
